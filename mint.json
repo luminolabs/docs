@@ -1,91 +1,101 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Lumino",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
+  "background": { "style": "gradient" },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373",
+    "primary": "#9065e6",
+    "light": "#9065e6",
+    "dark": "#9065e6",
     "anchors": {
-      "from": "#0D9373",
-      "to": "#07C983"
+      "from": "#ff4da5",
+      "to": "#9065e6"
     }
-  },
-  "topbarLinks": [
-    {
-      "name": "Support",
-      "url": "mailto:hi@mintlify.com"
-    }
-  ],
-  "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
   },
   "tabs": [
     {
       "name": "API Reference",
-      "url": "api-reference"
+      "url": "api-reference",
+      "openapi": "/api-keys.yml"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "/users.yml"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "/models.yml"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "/usage.yml"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "/fine-tuning.yml"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "/datasets.yml"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "/billing.yml"
     }
   ],
+  "topbarCtaButton": {
+    "name": "Get Early Access",
+    "url": "https://www.luminolabs.ai/contact",
+    "arrow": false,
+    "style": "roundedRectangle"
+  },
   "anchors": [
     {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
+      "name": "About",
+      "icon": "users",
+      "url": "https://www.luminolabs.ai/about"
     },
-    {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
-    },
+
     {
       "name": "Blog",
       "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "url": "https://www.luminolabs.ai/blog"
     }
   ],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Getting Started",
+      "pages": ["introduction"]
+    },
+    {
+      "group": "Fine-Tuning",
       "pages": [
-        "introduction",
-        "quickstart",
-        "development"
+        "fine-tuning",
+        {
+          "group": "Data Preparation",
+          "pages": ["upload-training-data"]
+        },
+        "fine-tuning-models",
+        "tutorial"
       ]
     },
     {
-      "group": "Essentials",
-      "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
-      ]
-    },
-    {
-      "group": "API Documentation",
-      "pages": [
-        "api-reference/introduction"
-      ]
-    },
-    {
-      "group": "Endpoint Examples",
-      "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
-      ]
+      "group": "Frequently Asked Questions",
+      "pages": ["faq", "error-codes"]
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "x": "https://twitter.com/luminoai",
+    "linkedin": "https://www.linkedin.com/company/luminoai/"
   }
 }
