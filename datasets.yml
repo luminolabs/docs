@@ -1,0 +1,253 @@
+openapi: 3.0.0
+info:
+  title: Datasets API
+  version: 1.0.0
+  description: API for managing dataset files
+
+paths:
+  /v1/datasets:
+    post:
+      summary: Upload a new dataset file
+      tags:
+        - Datasets
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: JSONL file in OpenAI format
+                name:
+                  type: string
+                  description: User-assigned name for the dataset
+                description:
+                  type: string
+                  description: User-provided description of the dataset
+      responses:
+        '201':
+          description: Successfully uploaded dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    get:
+      summary: List all datasets uploaded by the user
+      tags:
+        - Datasets
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/ItemsPerPageParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DatasetResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/datasets/{dataset_name}:
+    get:
+      summary: Get information about a specific dataset
+      tags:
+        - Datasets
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: dataset_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      summary: Update a specific dataset's information
+      tags:
+        - Datasets
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: dataset_name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasetUpdate'
+      responses:
+        '200':
+          description: Dataset updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete a specific dataset file
+      tags:
+        - Datasets
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: dataset_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Dataset deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    DatasetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [UPLOADED, VALIDATED, ERROR, DELETED]
+        name:
+          type: string
+        description:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: integer
+        errors:
+          type: object
+
+    DatasetUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name for the dataset
+        description:
+          type: string
+          description: The new description for the dataset
+    Pagination:
+      type: object
+      properties:
+        total_pages:
+          type: integer
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  parameters:
+    PageParam:
+      in: query
+      name: page
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+      description: Page number to retrieve
+    ItemsPerPageParam:
+      in: query
+      name: items_per_page
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+      description: Number of items to return per page
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

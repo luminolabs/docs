@@ -1,0 +1,212 @@
+openapi: 3.0.0
+info:
+  title: Billing API
+  version: 1.0.0
+  description: API for managing billing and credits
+
+paths:
+  /v1/billing/credits-add:
+    get:
+      summary: Redirect to Stripe for adding credits
+      tags:
+        - Billing
+      parameters:
+        - in: query
+          name: amount_dollars
+          schema:
+            type: integer
+          required: true
+      responses:
+        '302':
+          description: Redirect to Stripe payment page
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL of the Stripe payment page
+      security:
+        - ApiKeyAuth: [ ]
+
+  /v1/billing/credits-commit:
+    post:
+      summary: Check if user has enough credits for a job (Internal endpoint)
+      tags:
+        - Billing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditCommitRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditCommitResponse'
+      security:
+        - ApiKeyAuth: [ ]
+
+  /v1/billing/credit-history:
+    get:
+      summary: Get credit history for the current user
+      tags:
+        - Billing
+      parameters:
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            format: date
+          required: true
+        - in: query
+          name: end_date
+          schema:
+            type: string
+            format: date
+          required: true
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/ItemsPerPageParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CreditHistoryResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - ApiKeyAuth: [ ]
+
+components:
+  schemas:
+    CreditCommitRequest:
+      type: object
+      required:
+        - job_id
+        - user_id
+        - usage_amount
+        - usage_unit
+        - service_name
+      properties:
+        job_id:
+          type: string
+          format: uuid
+          description: The ID of the job
+        user_id:
+          type: string
+          format: uuid
+          description: The ID of the user
+        usage_amount:
+          type: integer
+          description: The amount of usage
+        usage_unit:
+          type: string
+          enum: [ token ]
+          description: The unit of usage
+        service_name:
+          type: string
+          description: The name of the service
+
+    CreditCommitResponse:
+      type: object
+      properties:
+        has_enough_credits:
+          type: boolean
+          description: Whether the user has enough credits for the job
+
+    CreditHistoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the credit record
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the credit record was created
+        credits:
+          type: number
+          format: float
+          description: The amount of credits added or deducted
+    Pagination:
+      type: object
+      properties:
+        total_pages:
+          type: integer
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  parameters:
+    PageParam:
+      in: query
+      name: page
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+      description: Page number to retrieve
+    ItemsPerPageParam:
+      in: query
+      name: items_per_page
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+      description: Number of items to return per page
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  title: Fine-tuning Jobs API
+  version: 1.0.0
+  description: API for managing fine-tuning jobs for language models
+
+paths:
+  /v1/fine-tuning:
+    post:
+      summary: Create a new fine-tuning job
+      tags:
+        - Fine-tuning Jobs
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FineTuningJobCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJobResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    get:
+      summary: List all fine-tuning jobs
+      tags:
+        - Fine-tuning Jobs
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/ItemsPerPageParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FineTuningJobResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/fine-tuning/{job_name}:
+    get:
+      summary: Get details of a specific fine-tuning job
+      tags:
+        - Fine-tuning Jobs
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: job_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJobDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v1/fine-tuning/{job_name}/cancel:
+    post:
+      summary: Cancel a fine-tuning job
+      tags:
+        - Fine-tuning Jobs
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: job_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FineTuningJobDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    FineTuningJobCreate:
+      type: object
+      required:
+        - base_model_name
+        - dataset_name
+        - parameters
+        - name
+      properties:
+        base_model_name:
+          type: string
+        dataset_name:
+          type: string
+        parameters:
+          type: object
+          properties:
+            num_epochs:
+              type: integer
+              example: 3
+            learning_rate:
+              type: number
+              format: float
+              example: 0.00002
+          additionalProperties: true
+        name:
+          type: string
+          description: The name of the fine-tuning job
+
+    FineTuningJobResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [NEW, PENDING, RUNNING, COMPLETED, FAILED, STOPPING, STOPPED]
+        base_model_name:
+          type: string
+        dataset_name:
+          type: string
+        name:
+          type: string
+        current_step:
+          type: integer
+        total_steps:
+          type: integer
+        current_epoch:
+          type: integer
+        total_epochs:
+          type: integer
+        num_tokens:
+          type: integer
+          description: Number of tokens processed in the fine-tuning job
+
+    FineTuningJobDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/FineTuningJobResponse'
+        - type: object
+          properties:
+            parameters:
+              type: object
+              properties:
+                num_epochs:
+                  type: integer
+                  example: 3
+                learning_rate:
+                  type: number
+                  format: float
+                  example: 0.00002
+              additionalProperties: true
+            metrics:
+              type: object
+              additionalProperties: true
+
+    Pagination:
+      type: object
+      properties:
+        total_pages:
+          type: integer
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  parameters:
+    PageParam:
+      in: query
+      name: page
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+      description: Page number to retrieve
+    ItemsPerPageParam:
+      in: query
+      name: items_per_page
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+      description: Number of items to return per page
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
