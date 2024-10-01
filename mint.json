@@ -90,6 +90,10 @@
       ]
     },
     {
+      "group": "Pricing",
+      "pages": ["pricing"]
+    },
+    {
       "group": "Frequently Asked Questions",
       "pages": ["faq", "error-codes"]
     }
