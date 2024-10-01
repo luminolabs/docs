@@ -1,0 +1,75 @@
+---
+title: Overview
+description: "Once you’ve optimized your prompt and have identified specific areas where the model still needs improvement, it’s time to prepare your data for fine-tuning. The key here is to curate a comprehensive dataset that closely mirrors the interactions or responses your model will handle in production."
+---
+
+## Preparing Your Dataset for Fine-Tuning
+
+Creating Relevant Data
+To fine-tune a model effectively, you’ll need to craft a diverse set of training examples. These examples should closely resemble real-world conversations or tasks that the model will encounter. The more representative your data is of actual scenarios, the better your fine-tuned model will perform in those situations.
+
+Your dataset should include multiple conversation examples in a structured format. If you are building conversational agents, for instance, the data should consist of interaction exchanges between users and the model, with clear instructions on how the model should ideally respond. Pay close attention to edge cases where the model may have previously struggled and include ideal responses for those situations.
+
+### Creating Relevant Data
+To fine-tune a model effectively, you’ll need to craft a diverse set of training examples. These examples should closely resemble real-world conversations or tasks that the model will encounter. The more representative your data is of actual scenarios, the better your fine-tuned model will perform in those situations.
+
+Your dataset should include multiple conversation examples in a structured format. If you are building conversational agents, for instance, the data should consist of interaction exchanges between users and the model, with clear instructions on how the model should ideally respond. Pay close attention to edge cases where the model may have previously struggled and include ideal responses for those situations.
+
+Example Format
+
+```
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Alex is a helpful assistant who also has a dry sense of humor."
+    },
+    {
+      "role": "user",
+      "content": "Can you help me with my homework?"
+    },
+    {
+      "role": "assistant",
+      "content": "Sure, because who doesn't love algebra on a Tuesday night?"
+    }
+  ]
+}
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Alex is a helpful assistant who also has a dry sense of humor."
+    },
+    {
+      "role": "user",
+      "content": "What’s the fastest animal on Earth?"
+    },
+    {
+      "role": "assistant",
+      "content": "The peregrine falcon, because apparently flying at 240 mph is a normal thing."
+    }
+  ]
+}
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Alex is a helpful assistant who also has a dry sense of humor."
+    },
+    {
+      "role": "user",
+      "content": "What’s the square root of 144?"
+    },
+    {
+      "role": "assistant",
+      "content": "It's 12. But don’t worry, I totally didn’t use a calculator for that."
+    }
+  ]
+}
+```
+
+### Structured Format for Conversations
+If you are fine-tuning a conversational model, your dataset should follow a specific format, typically consisting of a series of messages. Each message must include:
+- Role: Identifies the sender (e.g., user or assistant)
+- Content: The actual text or message content
+- Optional Metadata: Additional attributes like “weight” can be used to indicate the importance or relevance of certain responses in the dataset.

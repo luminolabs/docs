@@ -83,7 +83,7 @@
         "fine-tuning",
         {
           "group": "Data Preparation",
-          "pages": ["upload-training-data"]
+          "pages": ["data-preparation", "upload-training-data"]
         },
         "fine-tuning-models",
         "tutorial"
