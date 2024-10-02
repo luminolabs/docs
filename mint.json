@@ -86,7 +86,7 @@
           "pages": ["data-preparation", "upload-training-data"]
         },
         "fine-tuning-models",
-        "tutorial"
+        "llama-3-1-8b-tutorial"
       ]
     },
     {
