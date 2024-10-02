@@ -6,7 +6,7 @@ The rapid advancements in open-source models like Llama-3.1 demonstrate the grow
 
 In this guide, we’ll walk through how to fine-tune a Llama-3.1 8B model using the Lumino SDK on a sample dataset, transforming a base model into a fine-tuned, high-performance model for your specific needs. Our example will cover everything from dataset preparation to running evaluations, showing how a base model can be elevated to outperform larger models.
 
-# What You Will Learn
+## What You Will Learn
 
 - How to prepare and format your dataset for fine-tuning
 - Uploading datasets to Lumino using the SDK
@@ -22,7 +22,7 @@ In this guide, we’ll walk through how to fine-tune a Llama-3.1 8B model using 
 export LUMINO_API_KEY=your_api_key
 ```
 
-# Dataset Preparation
+## Dataset Preparation
 
 To begin, let’s prepare a dataset for fine-tuning. In this tutorial, we’ll use a simple trivia-based dataset. If you’re following along, feel free to create or use any dataset that fits your use case.
 
@@ -93,7 +93,7 @@ Result: Formatted_Trivia.jsonl
 {"messages": [{"role": "system", "content": "You are a helpful assistant that provides accurate answers to general knowledge questions."}, {"role": "user", "content": "What is the speed of light?"}, {"role": "assistant", "content": "The speed of light is approximately 299,792​⬤
 ```
 
-# Uploading the Dataset to Lumino
+## Uploading the Dataset to Lumino
 
 ### Method 1: Uploading via the Lumino SDK
 
@@ -126,11 +126,11 @@ Alternatively, you can upload your dataset through the Lumino Web App, which pro
 4.	Confirm the Upload:
 - After uploading, you’ll see the dataset listed in the Datasets section. You can now use this dataset for fine-tuning jobs.
 
-# Fine-tuning
+## Fine-tuning
 
 After uploading the dataset, we can start a fine-tuning job.
 
-## Create Fine Tune Job
+### Create Fine Tune Job
 
 The fine-tuning parameters are flexible, allowing you to adjust aspects like batch size, learning rate, and the number of epochs. In this example, we’ll use 5 epochs and a small batch size to keep things lightweight.
 
@@ -157,7 +157,7 @@ async def main():
 asyncio.run(main())
 ```
 
-## Monitoring the Job
+### Monitoring the Job
 
 While the job is running, you can monitor its status or adjust certain parameters by interacting with the Lumino API. Below is an example of retrieving the fine-tuning job’s status:
 
@@ -174,15 +174,15 @@ async def main():
 asyncio.run(main())
 ```
 
-# Evaluating the Fine-tuned Model
+## Evaluating the Fine-tuned Model
 
 Since Lumino SDK currently does not support model evaluation, we can manually download the fine-tuned model and evaluate it using libraries like Hugging Face’s transformers. This allows you to load the model and compare its outputs with a set of evaluation prompts and expected responses.
 
-## Step 1: Export Your Fine-tuned Model
+### Step 1: Export Your Fine-tuned Model
 
 Once your model has been fine-tuned using the Lumino SDK, download the model files (this will depend on your hosting method) or save it locally if you’re running the fine-tuning job on your infrastructure.
 
-## Step 2: Prepare the Evaluation Dataset (EvalTrivia.jsonl)
+### Step 2: Prepare the Evaluation Dataset (EvalTrivia.jsonl)
 
 We’ll use the same trivia dataset for evaluation:
 
@@ -192,7 +192,7 @@ We’ll use the same trivia dataset for evaluation:
 {"instruction": "What is the boiling point of water?", "output": "The boiling point of water is 100 degrees Celsius at sea level."}
 ```
 
-## Step 3: Load the Model and Evaluate using Hugging Face Transformers
+### Step 3: Load the Model and Evaluate using Hugging Face Transformers
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -229,6 +229,6 @@ accuracy = (correct_predictions / total_predictions) * 100
 print(f"Evaluation Complete. Accuracy: {accuracy:.2f}%")
 ```
 
-# Conclusion
+## Conclusion
 
 By using the Lumino SDK, you can quickly fine-tune open-source models like Llama-3.1 8B for specific tasks, creating faster, more accurate models at a fraction of the cost of closed-source alternatives.
