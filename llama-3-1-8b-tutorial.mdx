@@ -138,20 +138,25 @@ The fine-tuning parameters are flexible, allowing you to adjust aspects like bat
 import os
 import asyncio
 from lumino.sdk import LuminoSDK
+from lumino.models import (
+    FineTuningJobCreate,FineTuningJobParameters
+)
 
 async def main():
     async with LuminoSDK(os.environ.get("LUMINO_API_KEY")) as client:
-        job = await client.fine_tuning.create_fine_tuning_job(
+        job = await client.fine_tuning.create_fine_tuning_job(FineTuningJobCreate(
             base_model_name="llm_llama3_1_8b",
-            dataset_name="Formatted_SampleInstruct.jsonl",
-            name="sample_fine_tune_job",
-            parameters={
-                "batch_size": 4,
-                "num_epochs": 5,
-                "learning_rate": 1e-5,
-                "use_lora": True,
-            }
-        )
+            dataset_name="sample",
+            name="industrial-finetune",
+            type="LORA",
+            parameters=FineTuningJobParameters(
+                batch_size=2,
+                shuffle=True,
+                num_epochs=1,
+                lr=0.1,
+                seed=42
+            )
+        ))
         print(f"Fine-tuning job started: {job}")
 
 asyncio.run(main())
@@ -174,60 +179,59 @@ async def main():
 asyncio.run(main())
 ```
 
-## Evaluating the Fine-tuned Model
+## Inference the Fine-tuned Model
 
-Since Lumino SDK currently does not support model evaluation, we can manually download the fine-tuned model and evaluate it using libraries like Hugging Face’s transformers. This allows you to load the model and compare its outputs with a set of evaluation prompts and expected responses.
+Since Lumino SDK currently does not support model evaluation, we can manually download the fine-tuned model and perform inference using libraries like Hugging Face’s transformers. This allows you to load the model and generate responses based on input prompts.
 
 ### Step 1: Export Your Fine-tuned Model
 
 Once your model has been fine-tuned using the Lumino SDK, download the model files (this will depend on your hosting method) or save it locally if you’re running the fine-tuning job on your infrastructure.
 
-### Step 2: Prepare the Evaluation Dataset (EvalTrivia.jsonl)
+### Step 2: Prepare a Sample Prompt
 
-We’ll use the same trivia dataset for evaluation:
+Let’s say we want to ask the model a simple trivia question or prompt. For example:
 
 ```jsonl
 {"instruction": "What is the capital of Japan?", "output": "The capital of Japan is Tokyo."}
-{"instruction": "Who painted the Mona Lisa?", "output": "The Mona Lisa was painted by Leonardo da Vinci."}
-{"instruction": "What is the boiling point of water?", "output": "The boiling point of water is 100 degrees Celsius at sea level."}
 ```
+You can change this prompt based on your use case.
 
-### Step 3: Load the Model and Evaluate using Hugging Face Transformers
+
+### Step 3: Load the Model and Perform Inference using Hugging Face Transformers
+
+Here’s a Python script to load the fine-tuned model and perform inference:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import json
+import sys
+
+# Usage:
+# python predict.py "What is the capital of Japan?"
+
+# Ask the model something
+query = sys.argv[1]
 
 # Load your fine-tuned model and tokenizer (replace with your model path or Hugging Face hub path)
 model_path = "path_to_your_finetuned_model"
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForCausalLM.from_pretrained(model_path)
 
-# Function to generate predictions from the model
+# Generate predictions from the model
 def generate_answer(prompt):
     inputs = tokenizer(prompt, return_tensors="pt")
     outputs = model.generate(inputs['input_ids'], max_length=50)
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-# Load the evaluation dataset
-with open("EvalTrivia.jsonl", "r", encoding="utf-8") as f:
-    eval_data = [json.loads(line) for line in f]
-
-correct_predictions = 0
-total_predictions = len(eval_data)
-
-# Evaluate the model
-for example in eval_data:
-    predicted_answer = generate_answer(example["instruction"]).strip()
-    if predicted_answer == example["output"].strip():
-        correct_predictions += 1
-    else:
-        print(f"Incorrect prediction:\nQuestion: {example['instruction']}\nExpected: {example['output']}\nGot: {predicted_answer}\n")
-
-# Calculate accuracy
-accuracy = (correct_predictions / total_predictions) * 100
-print(f"Evaluation Complete. Accuracy: {accuracy:.2f}%")
+# Print model output
+print(generate_answer(query))
 ```
+
+Running the Inference
+```bash
+python predict.py "What is the capital of Japan?"
+```
+
+The model will return the fine-tuned response based on the prompt provided.
 
 ## Conclusion
 
