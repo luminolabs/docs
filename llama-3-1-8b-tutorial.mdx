@@ -79,14 +79,14 @@ for example in dataset:
     })
 
 # Write to a .jsonl file
-with open("Formatted_Trivia.jsonl", "w", encoding="utf-8") as f:
+with open("formatted-encyclopedia.jsonl", "w", encoding="utf-8") as f:
     for item in formatted_data:
         f.write(json.dumps(item) + "\n")
 
-print("Dataset has been formatted and saved to 'Formatted_Trivia.jsonl'.")
+print("Dataset has been formatted and saved to 'formatted-encyclopedia.jsonl'.")
 ```
 
-Result: Formatted_Trivia.jsonl
+Result: formatted_encyclopedia.jsonl
 ```jsonl
 {"messages": [{"role": "system", "content": "You are a helpful assistant that provides accurate answers to general knowledge questions."}, {"role": "user", "content": "What is the capital of France?"}, {"role": "assistant", "content": "The capital of France is Paris."}]}
 {"messages": [{"role": "system", "content": "You are a helpful assistant that provides accurate answers to general knowledge questions."}, {"role": "user", "content": "Who wrote the novel '1984'?"}, {"role": "assistant", "content": "The novel '1984' was written by George Orwell."}]}
@@ -111,7 +111,7 @@ from lumino.models import (
 async def main():
     async with LuminoSDK(os.environ.get("LUMINO_API_KEY")) as client:
         files = await client.dataset.list_datasets()
-        await client.dataset.upload_dataset("formatted-trivia.jsonl", DatasetCreate(name="trivia-dataset", description="trivia dataset"))
+        await client.dataset.upload_dataset("formatted-encyclopedia.jsonl", DatasetCreate(name="trivia-dataset", description="trivia dataset"))
 
         print(files)
 
