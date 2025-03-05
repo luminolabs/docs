@@ -15,11 +15,11 @@ In this guide, we’ll walk through how to fine-tune a Llama-3.1 8B model using 
 
 ### Prerequisites
 
-- **Lumino SDK**: Install using `pip install lumino`
+- **Lumino SDK**: Install using `pip install lumino-api-sdk-python`
 - **API Key**: Obtain it from the [Lumino dashboard](https://app.luminolabs.ai/), and set it up as an environment variable:
 
 ```bash
-export LUMINO_API_KEY=your_api_key
+export LUMSDK_API_KEY=your_api_key
 ```
 
 ## Dataset Preparation
@@ -102,14 +102,14 @@ Once the dataset is prepared, it’s time to upload it to Lumino using the SDK. 
 ```python
 import os
 import asyncio
-from lumino.sdk import LuminoSDK
-from lumino.models import (
+from lumino.api_sdk.sdk import LuminoSDK
+from lumino.api_sdk.models import (
     DatasetCreate,
 )
 
 
 async def main():
-    async with LuminoSDK(os.environ.get("LUMINO_API_KEY")) as client:
+    async with LuminoSDK(os.environ.get("LUMSDK_API_KEY")) as client:
         files = await client.dataset.list_datasets()
         await client.dataset.upload_dataset("formatted-encyclopedia.jsonl", DatasetCreate(name="trivia-dataset", description="trivia dataset"))
 
@@ -143,13 +143,13 @@ The fine-tuning parameters are flexible, allowing you to adjust aspects like bat
 ```python
 import os
 import asyncio
-from lumino.sdk import LuminoSDK
-from lumino.models import (
+from lumino.api_sdk.sdk import LuminoSDK
+from lumino.api_sdk.models import (
     FineTuningJobCreate,FineTuningJobParameters
 )
 
 async def main():
-    async with LuminoSDK(os.environ.get("LUMINO_API_KEY")) as client:
+    async with LuminoSDK(os.environ.get("LUMSDK_API_KEY")) as client:
         job = await client.fine_tuning.create_fine_tuning_job(FineTuningJobCreate(
             base_model_name="llm_llama3_1_8b",
             dataset_name="sample",
@@ -175,10 +175,10 @@ While the job is running, you can monitor its status or adjust certain parameter
 ```python
 import os
 import asyncio
-from lumino.sdk import LuminoSDK
+from lumino.api_sdk.sdk import LuminoSDK
 
 async def main():
-    async with LuminoSDK(os.environ.get("LUMINO_API_KEY")) as client:
+    async with LuminoSDK(os.environ.get("LUMSDK_API_KEY")) as client:
         jobs = await client.fine_tuning.list_fine_tuning_jobs()
         print("Fine-tuning jobs:", jobs)
 
@@ -243,4 +243,4 @@ The model will return the fine-tuned response based on the prompt provided.
 
 By using the Lumino SDK, you can quickly fine-tune open-source models like Llama-3.1 8B for specific tasks, creating faster, more accurate models at a fraction of the cost of closed-source alternatives. The flexibility of Lumino’s fine-tuning API allows you to customize the entire process, from dataset management to model deployment.
 
-For more details, check out our full [documentation](https://docs.luminolabs.ai/) or explore the [PyPi repo](https://pypi.org/project/lumino/) to get started.
+For more details, check out our full [documentation](https://docs.luminolabs.ai/) or explore the [PyPi repo](https://pypi.org/project/lumino-api-sdk-python/) to get started.
